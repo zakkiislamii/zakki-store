@@ -28,7 +28,7 @@ func GetAllProdukBaju(db *sql.DB) ([]structs.ProdukBaju, error) {
 	return produkBajus, nil
 }
 
-func InsertProdukoBaju(db *sql.DB, ProdukBaju structs.ProdukBaju) error {
+func InsertProdukBaju(db *sql.DB, ProdukBaju structs.ProdukBaju) error {
 	sql := "INSERT INTO Produk_Baju (nama_produk, harga, stok, id_toko, id_pabrik) VALUES ($1, $2, $3, $4, $5)"
 	_, err := db.Exec(sql, ProdukBaju.NamaProduk, ProdukBaju.Harga, ProdukBaju.Stok, ProdukBaju.IdTokoBaju, ProdukBaju.IdPabrik)
 	if err != nil {
@@ -57,4 +57,38 @@ func DeleteProdukBaju(db *sql.DB, id int) error {
 	}
 	log.Println("ProdukBaju deleted successfully")
 	return nil
+}
+
+func GetProdukInfo(db *sql.DB) ([]structs.ProdukInfo, error) {
+	query := `
+		SELECT pb.nama_produk, pb.harga, pb.stok, t.nama_toko
+		FROM Produk_Baju pb
+		JOIN Toko_Baju t ON pb.id_toko = t.id_toko
+	`
+
+	rows, err := db.Query(query)
+	if err != nil {
+		log.Printf("Error executing query: %v\n", err)
+		return nil, err
+	}
+	defer rows.Close()
+
+	var produkInfo []structs.ProdukInfo
+
+	for rows.Next() {
+		var info structs.ProdukInfo
+		err := rows.Scan(&info.NamaProduk, &info.Harga, &info.Stok, &info.NamaToko)
+		if err != nil {
+			log.Printf("Error scanning row: %v\n", err)
+			return nil, err
+		}
+		produkInfo = append(produkInfo, info)
+	}
+
+	if err := rows.Err(); err != nil {
+		log.Printf("Error iterating rows: %v\n", err)
+		return nil, err
+	}
+
+	return produkInfo, nil
 }
