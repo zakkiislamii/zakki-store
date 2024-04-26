@@ -100,16 +100,16 @@ type ProdukInfo struct {
 }
 
 type PelangganUlasan struct {
-	Ulasan      string `json:"ulasan"`
-	Rating      int    `json:"rating"`
-	NamaToko    string `json:"nama_toko"`
-	NamaProduk  string `json:"nama_produk"`
-	Username    string `json:"username"`
+	Ulasan     string `json:"ulasan"`
+	Rating     int    `json:"rating"`
+	NamaToko   string `json:"nama_toko"`
+	NamaProduk string `json:"nama_produk"`
+	Username   string `json:"username"`
 }
 
 type RiwayatUlasan struct {
-	Ulasan        string `json:"ulasan"`
-	Rating        int    `json:"rating"`
-	NamaProduk    string `json:"nama_produk"`
-	NamaToko      string `json:"nama_toko"`
+	Ulasan     string `json:"ulasan"`
+	Rating     int    `json:"rating"`
+	NamaProduk string `json:"nama_produk"`
+	NamaToko   string `json:"nama_toko"`
 }

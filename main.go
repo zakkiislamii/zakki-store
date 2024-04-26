@@ -1,11 +1,12 @@
 package main
 
 import (
+	"os"
 	"zakki-store/models"
 	"zakki-store/routers"
 )
 
 func main() {
 	models.ConnectDB()
-	routers.StartServer().Run(":8080")
+	routers.StartServer().Run(":" + os.Getenv("PGPORT"))
 }
