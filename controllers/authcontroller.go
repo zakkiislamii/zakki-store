@@ -29,7 +29,7 @@ func Login(c *gin.Context) {
 		if userInput.Username == "admin" && userInput.Password == "admin123" {
 			// Jika pengguna adalah admin, buat token JWT
 			expTime := time.Now().Add(time.Minute * 1)
-			claims := &config.JWTClaim{
+			claims := &config.JWTAdmin{
 				Username: userInput.Username,
 				RegisteredClaims: jwt.RegisteredClaims{
 					Issuer:    "go-jwt-mux",
