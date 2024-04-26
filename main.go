@@ -18,7 +18,7 @@ func main() {
 	models.ConnectDB()
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "22301" // Default to port 8080 if PORT environment variable is not set
+		port = "55341" // Default to port 8080 if PORT environment variable is not set
 	}
 	routers.StartServer().Run(":" + port)
 }
