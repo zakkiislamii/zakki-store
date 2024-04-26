@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"zakki-store/database"
 	"zakki-store/models"
 	"zakki-store/routers"
 
@@ -16,7 +17,11 @@ func main() {
 		os.Exit(1)
 	}
 	models.ConnectDB()
-	err = models.DbMigrate(models.DB)
+	if models.DB == nil {
+		fmt.Println("Failed to connect to database")
+		os.Exit(1)
+	}
+	err = database.DbMigrate(models.DB)
 	if err != nil {
 		fmt.Println("Error migrating database:", err)
 		os.Exit(1)
