@@ -12,6 +12,7 @@ func StartServer() *gin.Engine {
 	r.POST("/login", controllers.Login)
 	r.POST("/register", controllers.Register)
 	r.GET("/logout", controllers.Logout)
+	r.GET("/pelanggan/semua-data", controllers.IndexPelanggan)
 
 	// Rute-rute yang memerlukan autentikasi sebagai admin
 	adminRoutes := r.Group("/")
