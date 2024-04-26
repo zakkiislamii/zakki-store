@@ -38,7 +38,7 @@ func Login(c *gin.Context) {
 			}
 
 			tokenAlgo := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
-			token, err := tokenAlgo.SignedString(config.JWT_KEY)
+			token, err := tokenAlgo.SignedString(config.JWT_KEY_Admin)
 			if err != nil {
 				response := map[string]string{"message": err.Error()}
 				helper.ResponseJSON(c, http.StatusInternalServerError, response)
