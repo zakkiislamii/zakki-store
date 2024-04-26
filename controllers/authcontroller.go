@@ -46,7 +46,7 @@ func Login(c *gin.Context) {
 			}
 
 			// Set cookie token
-			c.SetCookie("token", token, 60, "/", "", false, true)
+			c.SetCookie("token", token, 600, "/", "", false, true)
 
 			log.Printf("Admin logged in: %s", userInput.Username)
 			response := map[string]string{"message": "Login berhasil sebagai admin"}
@@ -80,7 +80,7 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	c.SetCookie("token", token, 60, "/", "", false, true)
+	c.SetCookie("token", token, 600, "/", "", false, true)
 
 	log.Printf("User logged in: %s", userInput.Username)
 	response := map[string]string{"message": "Login berhasil"}

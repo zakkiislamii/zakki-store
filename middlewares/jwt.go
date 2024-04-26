@@ -63,9 +63,9 @@ func JWTMiddlewareAdmin() gin.HandlerFunc {
 			}
 		}
 
-		claims := &config.JWTClaimm{}
+		claims := &config.JWTAdmin{}
 		token, err := jwt.ParseWithClaims(tokenString, claims, func(t *jwt.Token) (interface{}, error) {
-			return config.JWT_KEYY, nil
+			return config.JWT_KEY_Admin, nil
 		})
 
 		if err != nil {
