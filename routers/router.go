@@ -2,17 +2,20 @@ package routers
 
 import (
 	"zakki-store/controllers"
+	"zakki-store/middlewares"
 
 	"github.com/gin-gonic/gin"
 )
 
 func StartServer() *gin.Engine {
 	r := gin.Default()
-
+	r.POST("/login", controllers.Login)
 	r.POST("/register", controllers.Register)
+	r.GET("/logout", controllers.Logout)
 
 	// Rute-rute yang memerlukan autentikasi sebagai admin
 	adminRoutes := r.Group("/")
+	adminRoutes.Use(middlewares.JWTMiddlewareAdmin())
 	{
 		adminRoutes.GET("/pelanggan/semua-data", controllers.IndexPelanggan)
 		adminRoutes.POST("/pelanggan/tambah", controllers.CreatePelanggan)
@@ -35,6 +38,7 @@ func StartServer() *gin.Engine {
 
 	// Rute-rute yang memerlukan autentikasi sebagai pelanggan
 	PelangganRoutes := r.Group("/")
+	PelangganRoutes.Use(middlewares.JWTMiddleware())
 	{
 		PelangganRoutes.GET("/ulasan-semua-produk", controllers.ViewUlasan)
 		PelangganRoutes.POST("/beli-produk", controllers.BeliProduk)

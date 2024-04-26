@@ -3,6 +3,7 @@ package models
 import (
 	"database/sql"
 	"fmt"
+	"log"
 	"os"
 
 	"github.com/joho/godotenv"
@@ -10,41 +11,40 @@ import (
 )
 
 var (
-	DB  *sql.DB
-	err error
+	DB *sql.DB
 )
 
 func ConnectDB() {
-	// Membaca file environment
-	err = godotenv.Load("config/.env")
+	// Load environment variables from file
+	err := godotenv.Load("config/.env")
 	if err != nil {
-		fmt.Println("Tidak sukses membaca file environment:", err)
-		return // Keluar dari fungsi jika gagal membaca file environment
+		log.Println("Failed to read environment file:", err)
+		return
 	}
-	fmt.Println("Sukses membaca file environment")
+	log.Println("Successfully read environment file")
 
-	// Mendapatkan nilai-nilai koneksi dari environment
+	// Get connection values from environment
 	dbHost := os.Getenv("DB_HOST")
 	dbPort := os.Getenv("DB_PORT")
 	dbUser := os.Getenv("DB_USER")
 	dbPassword := os.Getenv("DB_PASSWORD")
 	dbName := os.Getenv("DB_NAME")
 
-	// Membuat string koneksi
+	// Construct connection string
 	psqlInfo := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=disable", dbHost, dbPort, dbUser, dbPassword, dbName)
 
-	// Membuka koneksi ke database
+	// Open database connection
 	DB, err = sql.Open("postgres", psqlInfo)
 	if err != nil {
-		fmt.Println("Gagal membuka koneksi:", err)
-		return // Keluar dari fungsi jika gagal membuka koneksi
+		log.Println("Failed to open connection:", err)
+		return
 	}
 
-	// Memeriksa koneksi ke database
+	// Check database connection
 	err = DB.Ping()
 	if err != nil {
-		fmt.Println("Gagal melakukan ping ke database:", err)
-		return // Keluar dari fungsi jika ping gagal
+		log.Println("Failed to ping database:", err)
+		return
 	}
-	fmt.Println("Koneksi ke database berhasil")
+	log.Println("Database connection successful")
 }

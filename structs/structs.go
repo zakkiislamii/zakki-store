@@ -49,7 +49,7 @@ type UlasanPelanggan struct {
 }
 
 type Transaksi struct {
-	//IdTransaksi      int       `json:"id_transaksi"`
+	IdTransaksi      int       `json:"id_transaksi"`
 	TanggalTransaksi time.Time `json:"tanggal_transaksi"`
 	JumlahBarang     int       `json:"jumlah_barang"`
 	TotalHarga       int       `json:"total_harga"`

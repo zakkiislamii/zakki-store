@@ -2,35 +2,41 @@ package models
 
 import (
 	"database/sql"
+	"errors"
 	"log"
 	"zakki-store/structs"
 )
 
 func GetAllPelanggan(db *sql.DB) ([]structs.Pelanggan, error) {
-	sql := "SELECT * FROM Pelanggan"
-	rows, err := db.Query(sql)
+	query := "SELECT * FROM Pelanggan"
+	rows, err := db.Query(query)
 	if err != nil {
 		log.Printf("Error executing query: %v\n", err)
 		return nil, err
 	}
 	defer rows.Close()
 
-	var p []structs.Pelanggan
+	var pelanggan []structs.Pelanggan
 	for rows.Next() {
-		var pelanggan structs.Pelanggan
-		if err := rows.Scan(&pelanggan.IdPelanggan, &pelanggan.NamaPelanggan, &pelanggan.NoHp, &pelanggan.Username, &pelanggan.Password); err != nil {
+		var p structs.Pelanggan
+		if err := rows.Scan(&p.IdPelanggan, &p.NamaPelanggan, &p.NoHp, &p.Username, &p.Password); err != nil {
 			log.Printf("Error scanning row: %v\n", err)
 			return nil, err
 		}
-		p = append(p, pelanggan)
+		pelanggan = append(pelanggan, p)
 	}
 	log.Println("Successfully retrieved all pelanggan data")
-	return p, nil
+	return pelanggan, nil
 }
 
 func ViewUlasan(db *sql.DB) ([]structs.UlasanPelanggan, error) {
-	sql := "SELECT pb.nama_produk, pl.nama_pelanggan, u.rating, u.ulasan FROM Ulasan u JOIN Produk_Baju pb ON u.id_produk = pb.id_produk JOIN Pelanggan pl ON u.id_pelanggan = pl.id_pelanggan;"
-	rows, err := db.Query(sql)
+	query := `
+		SELECT pb.nama_produk, pl.nama_pelanggan, u.rating, u.ulasan 
+		FROM Ulasan u 
+		JOIN Produk_Baju pb ON u.id_produk = pb.id_produk 
+		JOIN Pelanggan pl ON u.id_pelanggan = pl.id_pelanggan
+	`
+	rows, err := db.Query(query)
 	if err != nil {
 		log.Printf("Error executing query: %v\n", err)
 		return nil, err
@@ -51,8 +57,8 @@ func ViewUlasan(db *sql.DB) ([]structs.UlasanPelanggan, error) {
 }
 
 func InsertPelanggan(db *sql.DB, pelanggan structs.Pelanggan) error {
-	sql := "INSERT INTO Pelanggan (nama_pelanggan, no_hp, username, password) VALUES ($1, $2, $3, $4)"
-	_, err := db.Exec(sql, pelanggan.NamaPelanggan, pelanggan.NoHp, pelanggan.Username, pelanggan.Password)
+	query := "INSERT INTO Pelanggan (nama_pelanggan, no_hp, username, password) VALUES ($1, $2, $3, $4)"
+	_, err := db.Exec(query, pelanggan.NamaPelanggan, pelanggan.NoHp, pelanggan.Username, pelanggan.Password)
 	if err != nil {
 		log.Printf("Error inserting pelanggan: %v\n", err)
 		return err
@@ -62,8 +68,8 @@ func InsertPelanggan(db *sql.DB, pelanggan structs.Pelanggan) error {
 }
 
 func UpdatePelanggan(db *sql.DB, pelanggan structs.Pelanggan) error {
-	sql := "UPDATE Pelanggan SET nama_pelanggan = $1, no_hp = $2, username = $3, password = $4  WHERE id_pelanggan = $5"
-	_, err := db.Exec(sql, pelanggan.NamaPelanggan, pelanggan.NoHp, pelanggan.Username, pelanggan.Password, pelanggan.IdPelanggan)
+	query := "UPDATE Pelanggan SET nama_pelanggan = $1, no_hp = $2, username = $3, password = $4  WHERE id_pelanggan = $5"
+	_, err := db.Exec(query, pelanggan.NamaPelanggan, pelanggan.NoHp, pelanggan.Username, pelanggan.Password, pelanggan.IdPelanggan)
 	if err != nil {
 		log.Printf("Error updating pelanggan: %v\n", err)
 		return err
@@ -73,8 +79,8 @@ func UpdatePelanggan(db *sql.DB, pelanggan structs.Pelanggan) error {
 }
 
 func DeletePelanggan(db *sql.DB, id int) error {
-	sql := "DELETE FROM Pelanggan WHERE id_pelanggan = $1"
-	_, err := db.Exec(sql, id)
+	query := "DELETE FROM Pelanggan WHERE id_pelanggan = $1"
+	_, err := db.Exec(query, id)
 	if err != nil {
 		log.Printf("Error deleting pelanggan: %v\n", err)
 		return err
@@ -84,7 +90,7 @@ func DeletePelanggan(db *sql.DB, id int) error {
 }
 
 func BeriUlasan(db *sql.DB, ulasan structs.PelangganUlasan) error {
-	_, err := db.Exec(`
+	query := `
 		INSERT INTO Ulasan (ulasan, rating, id_produk, id_pelanggan)
 		SELECT
 			$1,  -- Ulasan
@@ -95,8 +101,9 @@ func BeriUlasan(db *sql.DB, ulasan structs.PelangganUlasan) error {
 			SELECT 1 FROM Produk_Baju WHERE nama_produk = $3
 		) AND EXISTS (
 			SELECT 1 FROM Pelanggan WHERE username = $4
-		)`,
-		ulasan.Ulasan, ulasan.Rating, ulasan.NamaProduk, ulasan.Username)
+		)
+	`
+	_, err := db.Exec(query, ulasan.Ulasan, ulasan.Rating, ulasan.NamaProduk, ulasan.Username)
 	if err != nil {
 		log.Printf("Error inserting ulasan: %v\n", err)
 		return err
@@ -140,4 +147,22 @@ func GetUlasanPelangganByUsername(db *sql.DB, username string) ([]structs.Riwaya
 	}
 
 	return ulasanPelanggan, nil
+}
+
+func LoginUser(username, password string) error {
+	var user structs.Pelanggan
+	row := DB.QueryRow("SELECT * FROM Pelanggan WHERE username = $1", username)
+	err := row.Scan(&user.IdPelanggan, &user.NamaPelanggan, &user.NoHp, &user.Username, &user.Password)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return errors.New("username atau password salah")
+		}
+		return err
+	}
+
+	if user.Password != password {
+		return errors.New("username atau password salah")
+	}
+
+	return nil
 }
