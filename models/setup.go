@@ -51,16 +51,17 @@ func ConnectDB() {
 	log.Println("Database connection successful")
 }
 
-func DbMigrate(dbParam *sql.DB) {
+func DbMigrate(dbParam *sql.DB) error {
 	migrations := &migrate.PackrMigrationSource{
 		Box: packr.NewBox("./sql_migrations"),
 	}
 
 	n, err := migrate.Exec(dbParam, "postgres", migrations, migrate.Up)
 	if err != nil {
-		panic(err)
+		return err
 	}
 
 	DB = dbParam
 	fmt.Println("Applied", n, "migrations!")
+	return nil
 }
