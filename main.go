@@ -16,6 +16,7 @@ func main() {
 		os.Exit(1)
 	}
 	models.ConnectDB()
+	models.DbMigrate(models.DB)
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "55341" // Default to port 8080 if PORT environment variable is not set

@@ -6,8 +6,10 @@ import (
 	"log"
 	"os"
 
+	"github.com/gobuffalo/packr"
 	"github.com/joho/godotenv"
 	_ "github.com/lib/pq"
+	migrate "github.com/rubenv/sql-migrate"
 )
 
 var (
@@ -47,4 +49,18 @@ func ConnectDB() {
 		return
 	}
 	log.Println("Database connection successful")
+}
+
+func DbMigrate(dbParam *sql.DB) {
+	migrations := &migrate.PackrMigrationSource{
+		Box: packr.NewBox("./sql_migrations"),
+	}
+
+	n, err := migrate.Exec(dbParam, "postgres", migrations, migrate.Up)
+	if err != nil {
+		panic(err)
+	}
+
+	DB = dbParam
+	fmt.Println("Applied", n, "migrations!")
 }
